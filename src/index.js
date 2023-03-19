@@ -49,9 +49,7 @@ function renderCountryList(e) {
         return `
           <img src = "${country.flags.svg}" alt="Flag country" width="50" /> 
           <h2>${country.name.official}</h2>
-          <ul>
-            <li>Capital:</li>
-          </ul>`
+          `
         })
     .join('');       
 }    
