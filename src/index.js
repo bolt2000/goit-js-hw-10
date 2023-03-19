@@ -15,7 +15,7 @@
 import './css/styles.css';
 import debounce from 'lodash.debounce';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import { fetchCountries } from './fetchCountries';
+import { API } from './api-service';
 
 const DEBOUNCE_DELAY = 300;
 
@@ -30,27 +30,33 @@ refs.countryInput.addEventListener('input', debounce(onSearch, DEBOUNCE_DELAY));
 
 function onSearch(e) {
     e.preventDefault();
-
+     const form = e.currentTarget;
     const countrySearch = refs.countryInput.value.trim();
 
-   if (countrySearch === '') {
-      refs.countryList.innerHTML = ''
-      refs.countryInfo.innerHTML = ''
-      return       
-      }
+  //  if (countrySearch === '') {
+  //     refs.countryList.innerHTML = ''
+  //     refs.countryInfo.innerHTML = ''
+  //     return       
+  //     }
 
   
-fetchCountries(countrySearch)
-.then(renderCountry)
-  .catch(error => Notify.failure('Не корректний запит або мало символів'));
+  fetchCountries(countrySearch)
+    .then(renderCountry)
+    .catch(error => Notify.failure('Не корректний запит або мало символів'))
+    .finally(() => form.reset());
 }
 
 
 // function fetchCountries(name) {
-//     return fetch(`https://restcountries.com/v3.1/name//${name}`)
-//       .then(response => response.json());
+//     return fetch(`https://restcountries.com/v3.1/name/${name}`)
+//       .then(response => response.json()
+// );
 // }
-
+const BASE_URL = 'https://restcountries.com/v3.1/name';
+function fetchCountries(name) {
+  return fetch(`${BASE_URL}/${name}`).then(response => response.json(),
+  );
+}
 
 
 function renderCountryList(evt) {
@@ -72,7 +78,7 @@ function renderCountryInfo(evt) {
    refs.countryInfo.innerHTML = evt
             .map(country => {
             return `
-      <img src = "${country.flags.svg}" alt="Flag country" width="50" />       
+      <img src = "${country.flags.svg}" alt="Flag country" width="50" /> 
       <h2>${country.name.official}</h2>
       <ul>
       <li>Capital:</li>
@@ -91,27 +97,27 @@ function renderCountryInfo(evt) {
 function renderCountry(country) {
 
 
-    if (country.length > 10 ) {
-    Notiflix.Notify.warning('Too many'); 
-    
-  } else if (country.length >= 2 && country.length <= 10) {
-    renderCountryList(country);     
-
-  } else {
-    renderCountryInfo(country);
-        
-  }
-
-  // if (country.length > 10 && country.length < 1) {
+  //   if (country.length > 10 ) {
   //   Notiflix.Notify.warning('Too many'); 
     
-  // } else if (country.length > 1 && country.length <= 10) {
+  // } else if (country.length >= 2 && country.length <= 10) {
   //   renderCountryList(country);     
 
   // } else {
   //   renderCountryInfo(country);
         
   // }
+
+  if (country.length > 10 && country.length < 1) {
+    Notiflix.Notify.warning('Too many'); 
+    
+  } else if (country.length > 1 && country.length <= 10) {
+    renderCountryList(country);     
+
+  } else {
+    renderCountryInfo(country);
+        
+  }
 }
   
 
