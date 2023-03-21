@@ -1,16 +1,4 @@
-// name.official - полное имя страны
-// capital - столица
-// population - население
-// flags.svg - ссылка на изображение флага
-// languages - массив языков
 
-/* <body>
-<input type="text" id="search-box" />
-<ul class="country-list"></ul>
-<div class="country-info"></div>
-
-<script src="index.js" type="module"></script>
-// </body> */
 
 import './css/styles.css';
 import debounce from 'lodash.debounce';
@@ -25,82 +13,78 @@ refs.countryInput.addEventListener('input', debounce(onSearch, DEBOUNCE_DELAY));
 
 function onSearch(e) {
     e.preventDefault();
-     const form = e.currentTarget;
+  
     const countrySearch = refs.countryInput.value.trim();
 
-  //  if (countrySearch === '') {
-  //     refs.countryList.innerHTML = ''
-  //     refs.countryInfo.innerHTML = ''
-  //     return       
-  //     }
+   if (countrySearch === '') {
+     refs.countryList.innerHTML = '';
+     refs.countryInfo.innerHTML = '';
+      return       
+      }
 
   
   API.fetchCountries(countrySearch)
     .then(renderCountry)
     .catch(error => onFetchError())
-    // .finally(() => form.reset())
     ;
+}
+
+function renderCountry(country) {
+
+
+  if (country.length > 10) {
+  
+    Notify.warning('Немає такої країни');
+    
+  } else if (country.length >= 2) {
+     refs.countryInfo.innerHTML = '';
+    renderCountryList(country);
+    
+
+  } else {
+    refs.countryList.innerHTML = '';
+    renderCountryInfo(country);
+        
+  }
+
 }
 
 
 function renderCountryList(e) {
 
    refs.countryList.innerHTML = e.map(country => {
-        return `
-          <img src = "${country.flags.svg}" alt="Flag country" width="50" /> 
-          <h2>${country.name.official}</h2>
+     return `
+        <li class="country-item">
+          <img src = "${country.flags.svg}" alt="Flag country" width="30" /> 
+          <h2 class="name">${country.name.official}</h2>
+          </li>
           `
         })
-    .join('');       
+    .join('');  
+   clearName(refs.renderCountryInfo);
 }    
 
 
 function renderCountryInfo(e) {
 
    refs.countryInfo.innerHTML = e.map(country => {
-        return `
-          <img src = "${country.flags.svg}" alt="Flag country" width="50" /> 
-          <h2>${country.name.official}</h2>
-          <ul>
-            <li>Capital:</li>
-                <span>${country.capital}</span> 
-            <li>Population:</li>
-                <span> ${country.population}</span>
-            <li>Languages:</li>
-                <span> ${Object.values(country.languages).join()}</span>
+     return `
+     <ul>
+        <li class="country-item">
+          <img src = "${country.flags.svg}" alt="Flag country" width="30" /> 
+          <h2 class="name">${country.name.official}</h2>
+            </li>
+          
+                 <li><span class="info">Capital:</span> ${country.capital}</li>
+                
+            <li><span class="info">Population:</span> ${country.population}</li>
+               
+            <li><span class="info">Languages:</span> ${Object.values(country.languages).join()}</li> 
           </ul>`
         })
     .join('');       
 }    
-
-
-function renderCountry(country) {
-
-
-    if (country.length > 10 ) {
-    Notiflix.Notify.warning('Too many'); 
-    
-  } else if (country.length >= 2 && country.length <= 10) {
-    renderCountryList(country);     
-
-  } else {
-    renderCountryInfo(country);
-        
-  }
-
-  // if (country.length > 10 && country.length < 1) {
-  //   Notiflix.Notify.warning('Too many'); 
-    
-  // } else if (country.length > 1 && country.length <= 10) {
-  //   renderCountryList(country);     
-
-  // } else {
-  //   renderCountryInfo(country);
-        
-  // }
-}
   
-
 function onFetchError(error) {
-  Notify.warning('Не корректний запит або мало символів')
+  Notify.info('Знайдено занадто багато совпадінь. Введіть більш конкретну назву')
 }
